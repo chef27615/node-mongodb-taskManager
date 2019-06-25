@@ -1,0 +1,6 @@
+node_modules/line
+package-lock.json
+yarn
+yarn.lock
+.env
+node_modules/
