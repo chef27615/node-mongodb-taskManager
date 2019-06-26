@@ -18,12 +18,16 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
 
     const db = client.db(databaseName) //calling the database used
     
-    db.collection('users').updateOne({
-        _id: new ObjectID('5d10dac31485f372b1533e6a')
-    }, {
-        $inc: {
-            age : 1
-        }
-    }).then( result => console.log(result)).catch(err => console.log(err))
-   
+    // db.collection('users').deleteMany({
+    //     age: 39
+    // }).then(result => {
+    //     console.log(result)
+    // }).catch(err => console.log(err))
+    db.collection('tasks').deleteOne({
+        "description" : "take out the trash"
+    }).then(result => {
+        console.log(result)
+    }).catch(err => {
+        console.log(err)
+    })
 })
