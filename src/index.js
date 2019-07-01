@@ -40,10 +40,23 @@ app.get('/users/:id', (req, res) => {
         if(!user){
             return res.status(404).send()
         }
-        res.send(user)
-        }).catch(e => {
-        res.status(500).send()
+        res.status(200).send(user)
+    }).catch(e => {
+        res.status(500).send(e)
     })
+})
+
+app.get('/tasks', (req, res) => {
+    Tasks.find({}).then((tasks) => {
+        res.status(200).send(tasks)
+    }).catch(e => res.status(500).send(e))
+})
+
+app.get('/tasks/:id', (req, res) => {
+    const _id = req.params.id;
+    Tasks.findById(_id).then((task) => {
+        task ? res.status(200).send(task) : res.status(404).send('cannot find task')
+    }).catch(e => res.status(500).send())
 })
 
 app.listen(port, () => {
