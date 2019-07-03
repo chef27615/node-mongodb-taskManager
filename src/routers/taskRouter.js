@@ -31,26 +31,6 @@ router.get('/tasks/:id', async (req, res) => {
     }
 })
 
-router.patch('/users/:id', async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'email', 'password', 'age']
-    const isValidOp = updates.every((update) => allowedUpdates.includes(update))
-
-    if(!isValidOp){
-        return res.status(400).send({error: 'invalid updates'})
-    }
-
-    try{
-        const newUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-        if(!newUser){
-            return res.status(404).send()
-        }
-        res.status(201).send(newUser)
-    }catch(e){
-        res.status(400).send(e)
-    }
-})
-
 router.patch('/tasks/:id', async (req, res) =>{
     const updates = Object.keys(req.body)
     const allowedUpdates = [ 'description', 'completed' ]
@@ -59,8 +39,11 @@ router.patch('/tasks/:id', async (req, res) =>{
         res.status(400).send({error:'not a valid update'})
     }
     try{
-        const updatedTask = await Tasks.findByIdAndUpdate(req.params.id, req.body, { runValidators:true, new:true })
-        updatedTask? res.status(201).send(updatedTask) : res.status(404).send('task does not exist')
+        const task = await Tasks.findById(req.params.id)
+        updates.forEach(update => task[update] = req.body[update])
+        await task.save()
+        // const updatedTask = await Tasks.findByIdAndUpdate(req.params.id, req.body, { runValidators:true, new:true })
+        task? res.status(200).send(task) : res.status(404).send('task does not exist')
     }catch(e){
         res.status(400).send(e)
     }

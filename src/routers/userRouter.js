@@ -16,6 +16,18 @@ router.post('/users', async (req, res) => {
     }
 })
 
+router.post('/users/login', async (req, res) => {
+   const { email, password } = req.body
+   
+    try{
+        const user = await User.findByCreds(email, password)
+        res.send(user)
+    }catch(e){
+        res.status(400).send('login failed')
+    }
+})
+
+
 router.get('/users', async (req, res) => {
     
     try{
@@ -46,6 +58,29 @@ router.delete('/users/:id', async (req, res) => {
         user ? res.status(200).send(user) : res.status(404).send()
     }catch(e){
         res.status(500).send()
+    }
+})
+
+router.patch('/users/:id', async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const isValidOp = updates.every((update) => allowedUpdates.includes(update))
+
+    if(!isValidOp){
+        return res.status(400).send({error: 'invalid updates'})
+    }
+
+    try{
+        const user = await User.findById(req.params.id)
+        updates.forEach((update) => user[update] = req.body[update])
+        await user.save()
+        // const newUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        if(!user){
+            return res.status(404).send()
+        }
+        res.status(201).send(user)
+    }catch(e){
+        res.status(400).send(e)
     }
 })
 
